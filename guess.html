@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>猜魚在哪裡 - 五餅二魚</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "微軟正黑體", "Microsoft JhengHei", Arial, sans-serif;
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .game-container {
+      background: white;
+      border-radius: 30px;
+      padding: 40px;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+      max-width: 900px;
+      width: 100%;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* 標題區域 */
+    .header {
+      margin-bottom: 30px;
+    }
+
+    .title {
+      font-size: 2.5em;
+      color: #e67e22;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(230, 126, 34, 0.2);
+    }
+
+    .subtitle {
+      font-size: 1.2em;
+      color: #7f8c8d;
+      margin-bottom: 20px;
+    }
+
+    /* 遊戲說明 */
+    .instructions {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 15px;
+      border-left: 4px solid #3498db;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    .instructions p {
+      color: #2c3e50;
+      line-height: 1.8;
+      margin-bottom: 8px;
+    }
+
+    /* 遊戲狀態 */
+    .game-status {
+      font-size: 1.3em;
+      color: #e67e22;
+      font-weight: bold;
+      margin-bottom: 30px;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 卡片容器 */
+    .cards-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      margin: 50px 0;
+      min-height: 300px;
+      flex-wrap: wrap;
+    }
+
+    /* 卡片樣式 */
+    .card {
+      width: 200px;
+      height: 280px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-front {
+      background: white;
+    }
+
+    .card-front img {
+      max-width: 70%;
+      max-height: 70%;
+      object-fit: contain;
+      filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+    }
+
+    .card-back {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transform: rotateY(180deg);
+      font-size: 6em;
+      color: white;
+      font-weight: bold;
+    }
+
+    .card-back::before {
+      content: '?';
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 卡片懸停效果 */
+    .card:hover {
+      transform: translateY(-10px);
+      transition: transform 0.3s;
+    }
+
+    .card.shuffling {
+      pointer-events: none;
+    }
+
+    /* 統計區域 */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 30px 0;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      background: #f8f9fa;
+      padding: 20px 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-label {
+      font-size: 0.9em;
+      color: #7f8c8d;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 2em;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .stat-item.correct .stat-value {
+      color: #27ae60;
+    }
+
+    .stat-item.wrong .stat-value {
+      color: #e74c3c;
+    }
+
+    /* 按鈕區域 */
+    .buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .btn {
+      background: white;
+      border: 3px solid #3498db;
+      padding: 15px 30px;
+      font-size: 1.1em;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+      color: #2c3e50;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      background: #3498db;
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary {
+      border-color: #e67e22;
+      background: linear-gradient(135deg, #e67e22, #d35400);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #d35400, #c0392b);
+      border-color: #d35400;
+      box-shadow: 0 8px 25px rgba(230, 126, 34, 0.4);
+    }
+
+    .btn-home {
+      border-color: #95a5a6;
+    }
+
+    .btn-home:hover {
+      background: #95a5a6;
+      border-color: #7f8c8d;
+    }
+
+    /* 結果訊息 */
+    .result-message {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 10px;
+      animation: slideIn 0.5s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-message.correct {
+      background: #d4edda;
+      color: #155724;
+      border: 2px solid #c3e6cb;
+    }
+
+    .result-message.wrong {
+      background: #f8d7da;
+      color: #721c24;
+      border: 2px solid #f5c6cb;
+    }
+
+    /* 聖經金句 */
+    .bible-verse {
+      background: #e3f2fd;
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #2196f3;
+      margin: 30px 0;
+      font-style: italic;
+      color: #424242;
+      line-height: 1.8;
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .game-container {
+        padding: 25px 20px;
+      }
+
+      .title {
+        font-size: 2em;
+      }
+
+      .cards-container {
+        gap: 15px;
+      }
+
+      .card {
+        width: 150px;
+        height: 210px;
+      }
+
+      .card-back::before {
+        font-size: 4em;
+      }
+
+      .stats {
+        gap: 20px;
+      }
+
+      .stat-item {
+        padding: 15px 20px;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        width: 100px;
+        height: 140px;
+      }
+
+      .card-front::after {
+        font-size: 3em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <!-- 標題 -->
+    <div class="header">
+      <h1 class="title">🎮 猜魚在哪裡</h1>
+      <p class="subtitle">考驗你的觀察力！</p>
+    </div>
+
+    <!-- 遊戲說明 -->
+    <div class="instructions">
+      <p>📋 <strong>遊戲規則：</strong></p>
+      <p>1. 記住魚的位置</p>
+      <p>2. 卡片會翻面並快速移動</p>
+      <p>3. 點擊你認為魚在的位置</p>
+      <p>4. 看看你能猜對幾次！</p>
+    </div>
+
+    <!-- 遊戲狀態 -->
+    <div id="gameStatus" class="game-status">
+      按下「開始遊戲」開始挑戰！
+    </div>
+
+    <!-- 結果訊息 -->
+    <div id="resultMessage"></div>
+
+    <!-- 卡片區域 -->
+    <div id="cardsContainer" class="cards-container">
+      <!-- 卡片將由 JavaScript 生成 -->
+    </div>
+
+    <!-- 統計區域 -->
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-label">總共猜了</div>
+        <div id="totalGuesses" class="stat-value">0</div>
+      </div>
+      <div class="stat-item correct">
+        <div class="stat-label">✓ 猜對</div>
+        <div id="correctGuesses" class="stat-value">0</div>
+      </div>
+      <div class="stat-item wrong">
+        <div class="stat-label">✗ 猜錯</div>
+        <div id="wrongGuesses" class="stat-value">0</div>
+      </div>
+    </div>
+
+    <!-- 按鈕區域 -->
+    <div class="buttons">
+      <button id="startBtn" class="btn btn-primary" onclick="startGame()">
+        🎯 開始遊戲
+      </button>
+      <button id="resetBtn" class="btn" onclick="resetStats()" disabled>
+        🔄 重置統計
+      </button>
+      <a href="index.html" class="btn btn-home">
+        🏠 返回首頁
+      </a>
+    </div>
+
+    <!-- 聖經金句 -->
+    <div class="bible-verse">
+      「你們要嘗嘗主恩的滋味，便知道他是美善；投靠他的人有福了。」<br>
+      —— 詩篇 34:8
+    </div>
+  </div>
+
+  <script>
+    // ========================================
+    // 遊戲變數
+    // ========================================
+    let cards = [];
+    let fishPosition = -1;
+    let isShuffling = false;
+    let canGuess = false;
+    let totalGuesses = 0;
+    let correctGuesses = 0;
+    let wrongGuesses = 0;
+
+    // 圖片 URL
+    const BREAD_IMG = 'https://i.ibb.co/dJXxJ7QG/image.png';
+    const FISH_IMG = 'https://i.ibb.co/Y4PPcjMg/image.png';
+
+    // ========================================
+    // 初始化遊戲
+    // ========================================
+    function initGame() {
+      const container = document.getElementById('cardsContainer');
+      container.innerHTML = '';
+      cards = [];
+
+      // 隨機決定魚的位置 (0, 1, 或 2)
+      fishPosition = Math.floor(Math.random() * 3);
+
+      // 創建三張卡片
+      for (let i = 0; i < 3; i++) {
+        const card = createCard(i);
+        container.appendChild(card);
+        cards.push(card);
+      }
+    }
+
+    // ========================================
+    // 創建卡片元素
+    // ========================================
+    function createCard(index) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.index = index;
+
+      const isFish = index === fishPosition;
+      const imageUrl = isFish ? FISH_IMG : BREAD_IMG;
+
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <img src="${imageUrl}" alt="${isFish ? '魚' : '餅'}">
+          </div>
+          <div class="card-face card-back"></div>
+        </div>
+      `;
+
+      card.addEventListener('click', () => handleCardClick(index));
+
+      return card;
+    }
+
+    // ========================================
+    // 開始遊戲
+    // ========================================
+    async function startGame() {
+      // 禁用按鈕
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('resetBtn').disabled = true;
+      document.getElementById('resultMessage').innerHTML = '';
+      canGuess = false;
+
+      // 初始化卡片
+      initGame();
+
+      // 更新狀態
+      updateStatus('記住魚的位置...');
+
+      // 先顯示卡片正面（給玩家看）
+      await delay(500);
+      cards.forEach(card => card.classList.remove('flipped'));
+
+      await delay(2000);
+
+      // 提示即將開始洗牌
+      updateStatus('準備洗牌...');
+      await delay(1000);
+
+      // 翻回背面
+      cards.forEach(card => card.classList.add('flipped'));
+      await delay(600);
+
+      // 開始洗牌
+      updateStatus('洗牌中... 👀');
+      await shuffleCards();
+
+      // 洗牌完成，可以猜了
+      updateStatus('魚在哪裡？點擊卡片猜猜看！');
+      canGuess = true;
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('resetBtn').disabled = false;
+    }
+
+    // ========================================
+    // 洗牌動畫
+    // ========================================
+    async function shuffleCards() {
+      isShuffling = true;
+      cards.forEach(card => card.classList.add('shuffling'));
+
+      const shuffleCount = 8; // 洗牌次數
+      const shuffleSpeed = 400; // 每次洗牌的時間
+
+      for (let i = 0; i < shuffleCount; i++) {
+        // 隨機交換兩張卡片的位置
+        const idx1 = Math.floor(Math.random() * 3);
+        const idx2 = (idx1 + 1 + Math.floor(Math.random() * 2)) % 3;
+
+        await swapCards(idx1, idx2, shuffleSpeed);
+      }
+
+      cards.forEach(card => card.classList.remove('shuffling'));
+      isShuffling = false;
+    }
+
+    // ========================================
+    // 交換兩張卡片
+    // ========================================
+    function swapCards(idx1, idx2, duration) {
+      return new Promise(resolve => {
+        const card1 = cards[idx1];
+        const card2 = cards[idx2];
+
+        // 獲取卡片位置
+        const rect1 = card1.getBoundingClientRect();
+        const rect2 = card2.getBoundingClientRect();
+
+        const deltaX = rect2.left - rect1.left;
+        const deltaY = rect2.top - rect1.top;
+
+        // 添加過渡動畫
+        card1.style.transition = `transform ${duration}ms ease-in-out`;
+        card2.style.transition = `transform ${duration}ms ease-in-out`;
+
+        // 移動卡片
+        card1.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${Math.random() * 360}deg)`;
+        card2.style.transform = `translate(${-deltaX}px, ${-deltaY}px) rotate(${Math.random() * 360}deg)`;
+
+        setTimeout(() => {
+          // 交換 DOM 位置
+          const container = document.getElementById('cardsContainer');
+          const parent = card1.parentNode;
+          const card1Next = card1.nextSibling;
+          const card2Next = card2.nextSibling;
+
+          if (card1Next === card2) {
+            parent.insertBefore(card2, card1);
+          } else if (card2Next === card1) {
+            parent.insertBefore(card1, card2);
+          } else {
+            parent.insertBefore(card1, card2Next);
+            parent.insertBefore(card2, card1Next);
+          }
+
+          // 重置樣式
+          card1.style.transition = '';
+          card2.style.transition = '';
+          card1.style.transform = '';
+          card2.style.transform = '';
+
+          // 更新陣列
+          [cards[idx1], cards[idx2]] = [cards[idx2], cards[idx1]];
+
+          // 更新魚的位置追蹤
+          if (parseInt(card1.dataset.index) === fishPosition) {
+            fishPosition = idx2;
+          } else if (parseInt(card2.dataset.index) === fishPosition) {
+            fishPosition = idx1;
+          }
+
+          resolve();
+        }, duration);
+      });
+    }
+
+    // ========================================
+    // 處理卡片點擊
+    // ========================================
+    function handleCardClick(clickedIndex) {
+      if (!canGuess || isShuffling) return;
+
+      canGuess = false;
+      totalGuesses++;
+
+      // 翻開所有卡片
+      cards.forEach(card => card.classList.remove('flipped'));
+
+      // 檢查是否猜對
+      const clickedCard = cards[clickedIndex];
+      const actualFishIndex = parseInt(clickedCard.dataset.index);
+      const isCorrect = actualFishIndex === fishPosition;
+
+      setTimeout(() => {
+        const resultDiv = document.getElementById('resultMessage');
+        
+        if (isCorrect) {
+          correctGuesses++;
+          resultDiv.className = 'result-message correct';
+          resultDiv.innerHTML = '🎉 太棒了！你猜對了！';
+          updateStatus('恭喜你找到魚了！🐟');
+        } else {
+          wrongGuesses++;
+          resultDiv.className = 'result-message wrong';
+          resultDiv.innerHTML = '😅 哎呀！魚不在這裡...';
+          updateStatus('再試一次吧！加油！💪');
+        }
+
+        updateStats();
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('resetBtn').disabled = false;
+      }, 600);
+    }
+
+    // ========================================
+    // 更新統計
+    // ========================================
+    function updateStats() {
+      document.getElementById('totalGuesses').textContent = totalGuesses;
+      document.getElementById('correctGuesses').textContent = correctGuesses;
+      document.getElementById('wrongGuesses').textContent = wrongGuesses;
+    }
+
+    // ========================================
+    // 重置統計
+    // ========================================
+    function resetStats() {
+      if (confirm('確定要重置所有統計數據嗎？')) {
+        totalGuesses = 0;
+        correctGuesses = 0;
+        wrongGuesses = 0;
+        updateStats();
+        document.getElementById('resultMessage').innerHTML = '';
+        updateStatus('統計已重置！準備開始新遊戲吧！');
+      }
+    }
+
+    // ========================================
+    // 更新遊戲狀態文字
+    // ========================================
+    function updateStatus(message) {
+      document.getElementById('gameStatus').textContent = message;
+    }
+
+    // ========================================
+    // 延遲函數
+    // ========================================
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // ========================================
+    // 頁面載入時初始化
+    // ========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log('猜魚遊戲載入完成');
+    });
+  </script>
+</body>
+</html>

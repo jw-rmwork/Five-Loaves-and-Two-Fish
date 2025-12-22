@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>五餅二魚小故事</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "微軟正黑體", "Microsoft JhengHei", Arial, sans-serif;
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 30px;
+      padding: 40px;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+      max-width: 900px;
+      width: 100%;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* 標題區域 */
+    .header {
+      margin-bottom: 30px;
+    }
+
+    .title {
+      font-size: 2.5em;
+      color: #e67e22;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(230, 126, 34, 0.2);
+    }
+
+    .subtitle {
+      font-size: 1.2em;
+      color: #7f8c8d;
+      margin-bottom: 20px;
+    }
+
+    /* 影片容器 */
+    .video-container {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 30px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+      background: #000;
+    }
+
+    .video-wrapper {
+      position: relative;
+      padding-bottom: 177.78%; /* 9:16 比例 (Shorts 格式) */
+      height: 0;
+      overflow: hidden;
+    }
+
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* 裝飾圖片 */
+    .decoration {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    .decoration img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      filter: drop-shadow(0 5px 15px rgba(0,0,0,0.15));
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    .decoration img:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+
+    .decoration img:nth-child(3) {
+      animation-delay: 0.6s;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* 說明文字 */
+    .description {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 15px;
+      border-left: 4px solid #e67e22;
+      margin: 30px 0;
+      text-align: left;
+    }
+
+    .description p {
+      color: #2c3e50;
+      line-height: 1.8;
+      margin-bottom: 10px;
+    }
+
+    .description .verse {
+      font-style: italic;
+      color: #7f8c8d;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 2px solid #ecf0f1;
+    }
+
+    /* 按鈕區域 */
+    .buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .btn {
+      background: white;
+      border: 3px solid #3498db;
+      padding: 15px 30px;
+      font-size: 1.1em;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+      color: #2c3e50;
+      text-decoration: none;
+      display: inline-block;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      background: #3498db;
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+    }
+
+    .btn-primary {
+      border-color: #e67e22;
+    }
+
+    .btn-primary:hover {
+      background: #e67e22;
+      box-shadow: 0 8px 25px rgba(230, 126, 34, 0.4);
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 600px) {
+      .container {
+        padding: 25px 20px;
+      }
+
+      .title {
+        font-size: 2em;
+      }
+
+      .subtitle {
+        font-size: 1em;
+      }
+
+      .video-container {
+        max-width: 100%;
+      }
+
+      .decoration img {
+        width: 45px;
+        height: 45px;
+      }
+
+      .description {
+        padding: 15px;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 標題 -->
+    <div class="header">
+      <h1 class="title">📖 五餅二魚小故事</h1>
+      <p class="subtitle">神蹟的見證 · 信心的力量</p>
+    </div>
+
+    <!-- 裝飾圖片 -->
+    <div class="decoration">
+      <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="麵包">
+      <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+      <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="麵包">
+    </div>
+
+    <!-- YouTube 影片 -->
+    <div class="video-container">
+      <div class="video-wrapper">
+        <iframe 
+          src="https://www.youtube.com/embed/4DfFGCe1fNI" 
+          title="五餅二魚小故事" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+
+    <!-- 說明文字 -->
+    <div class="description">
+      <p>
+        一個小男孩帶著五個餅和兩條魚來到曠野，<br>
+        在那裡，他遇見了耶穌和五千個飢餓的人...
+      </p>
+      <p>
+        當小男孩願意獻出他僅有的午餐時，<br>
+        神蹟就發生了！
+      </p>
+      <p class="verse">
+        「耶穌拿著這五個餅，兩條魚，望著天祝福，<br>
+        擘開餅，遞給門徒，門徒又遞給眾人。<br>
+        他們都吃，並且吃飽了。」<br>
+        —— 馬太福音 14:19-20
+      </p>
+    </div>
+
+    <!-- 按鈕 -->
+    <div class="buttons">
+      <a href="index.html" class="btn">
+        🏠 返回首頁
+      </a>
+      <a href="share.html" class="btn btn-primary">
+        ➡️ 繼續體驗遊戲
+      </a>
+    </div>
+  </div>
+</body>
+</html>

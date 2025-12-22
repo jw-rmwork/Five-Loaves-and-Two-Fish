@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>五餅二魚 - 你的選擇</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "微軟正黑體", "Microsoft JhengHei", Arial, sans-serif;
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      line-height: 1.8;
+    }
+
+    .game-container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      max-width: 700px;
+      width: 100%;
+      min-height: 500px;
+      position: relative;
+    }
+
+    /* 畫面控制 */
+    .screen {
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* 開始畫面 - 添加背景 */
+    #startScreen {
+      background-image: url('https://i.ibb.co/LD48R9mh/image.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+      border-radius: 15px;
+      padding: 40px;
+    }
+
+    /* 背景遮罩效果 */
+    #startScreen::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 15px;
+      z-index: 1;
+    }
+
+    #startScreen > * {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* 開始畫面 */
+    h1 {
+      color: #e67e22;
+      font-size: 2.5em;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      color: #d35400;
+      font-size: 1.5em;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .story-intro {
+      text-align: center;
+      font-size: 1.2em;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+
+    /* 小男孩圖片 */
+    .boy-image {
+      width: 200px;
+      height: 200px;
+      margin: 20px auto;
+      display: block;
+      object-fit: contain;
+      filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+    }
+
+    /* 食物顯示 */
+    .food-display {
+      font-size: 3em;
+      margin: 20px 0;
+      letter-spacing: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .food-display img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      filter: drop-shadow(0 3px 8px rgba(0,0,0,0.15));
+    }
+
+    .food-display-small {
+      font-size: 2em;
+      text-align: center;
+      margin: 15px 0;
+      letter-spacing: 3px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .food-display-small img {
+      width: 45px;
+      height: 45px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
+    }
+
+    .start-btn {
+      display: block;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #e67e22, #d35400);
+      color: white;
+      border: none;
+      padding: 18px 50px;
+      font-size: 1.3em;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+      box-shadow: 0 5px 20px rgba(230, 126, 34, 0.3);
+    }
+
+    .start-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(230, 126, 34, 0.4);
+    }
+
+    /* 場景標題 */
+    .scene-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .scene-number {
+      background: #3498db;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: bold;
+    }
+
+    /* 故事文字 */
+    .story-text {
+      font-size: 1.15em;
+      color: #2c3e50;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .story-text p {
+      margin-bottom: 10px;
+    }
+
+    .dialogue {
+      color: #e67e22;
+      font-style: italic;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+
+    /* 問題 */
+    .question {
+      font-size: 1.4em;
+      font-weight: bold;
+      color: #e67e22;
+      text-align: center;
+      margin: 25px 0;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* 選擇按鈕 */
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .choice-btn {
+      background: white;
+      border: 3px solid #3498db;
+      padding: 20px;
+      font-size: 1.15em;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: #2c3e50;
+      font-weight: bold;
+      text-align: left;
+      position: relative;
+      font-family: inherit;
+    }
+
+    .choice-btn:hover {
+      background: #3498db;
+      color: white;
+      transform: translateX(10px);
+      box-shadow: 0 5px 20px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-hint {
+      display: block;
+      font-size: 0.85em;
+      margin-top: 8px;
+      opacity: 0.8;
+      font-weight: normal;
+    }
+
+    /* 結局畫面 */
+    .ending {
+      text-align: center;
+    }
+
+    .ending-header {
+      background: linear-gradient(135deg, #e67e22, #d35400);
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+
+    /* 耶穌圖片 */
+    .jesus-image {
+      width: 250px;
+      height: 250px;
+      margin: 20px auto;
+      display: block;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));
+      border-radius: 10px;
+    }
+
+    .ending-content {
+      font-size: 1.1em;
+      color: #2c3e50;
+      text-align: left;
+      margin-bottom: 30px;
+    }
+
+    .ending-content p {
+      margin-bottom: 8px;
+    }
+
+    .highlight {
+      color: #e67e22;
+      font-weight: bold;
+      font-size: 1.15em;
+      margin: 15px 0;
+    }
+
+    .story-moment {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #3498db;
+      margin: 20px 0;
+    }
+
+    /* 野餐籃區塊 */
+    .basket-moment {
+      background: #fff8e1;
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #ffa726;
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .basket-image {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+      flex-shrink: 0;
+    }
+
+    .basket-text {
+      flex: 1;
+    }
+
+    /* 神蹟特效 */
+    .miracle-section {
+      background: linear-gradient(135deg, #fff8e1, #ffecb3);
+      padding: 25px;
+      border-radius: 15px;
+      margin: 25px 0;
+      box-shadow: 0 5px 20px rgba(255, 193, 7, 0.2);
+    }
+
+    .miracle-text {
+      font-size: 1.4em;
+      color: #f39c12;
+      font-weight: bold;
+      animation: glow 2s infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 0 10px rgba(243, 156, 18, 0.5); }
+      50% { text-shadow: 0 0 20px rgba(243, 156, 18, 0.8); }
+    }
+
+    .food-display-miracle {
+      font-size: 2em;
+      letter-spacing: 3px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 15px 0;
+    }
+
+    .food-display-miracle img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      filter: drop-shadow(0 3px 10px rgba(243, 156, 18, 0.4));
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .food-display-miracle img:nth-child(odd) {
+      animation-delay: 0.5s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* 聖經智慧區塊 */
+    .bible-section {
+      background: #e3f2fd;
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #2196f3;
+      margin: 25px 0;
+    }
+
+    .bible-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #1976d2;
+      margin-bottom: 15px;
+    }
+
+    .bible-quote {
+      font-style: italic;
+      color: #424242;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      line-height: 1.8;
+    }
+
+    /* 反思區塊 */
+    .reflection-section {
+      background: #fff3e0;
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #ff9800;
+      margin: 25px 0;
+    }
+
+    .reflection-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #f57c00;
+      margin-bottom: 15px;
+    }
+
+    .reflection-section p {
+      margin: 10px 0;
+      padding-left: 10px;
+    }
+
+    /* 結局訊息 */
+    .ending-message {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 25px;
+      font-style: italic;
+    }
+
+    /* 重新開始按鈕 */
+    .restart-btn {
+      display: block;
+      margin: 30px auto 0;
+      background: linear-gradient(135deg, #9b59b6, #8e44ad);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.2em;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+      box-shadow: 0 5px 20px rgba(155, 89, 182, 0.3);
+    }
+
+    .restart-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(155, 89, 182, 0.4);
+    }
+
+    /* 返回首頁按鈕 */
+    .home-btn {
+      display: block;
+      margin: 15px auto 0;
+      background: white;
+      color: #3498db;
+      border: 2px solid #3498db;
+      padding: 12px 35px;
+      font-size: 1em;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .home-btn:hover {
+      background: #3498db;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(52, 152, 219, 0.3);
+    }
+
+    /* 音樂控制按鈕 */
+    .music-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(52, 152, 219, 0.9);
+      color: white;
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      font-size: 1.5em;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .music-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+    }
+
+    .music-btn.muted {
+      background: rgba(149, 165, 166, 0.9);
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 600px) {
+      .game-container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 2em;
+      }
+      
+      .story-intro {
+        font-size: 1em;
+      }
+      
+      .boy-image {
+        width: 150px;
+        height: 150px;
+      }
+      
+      .food-display img {
+        width: 45px;
+        height: 45px;
+      }
+      
+      .food-display-small img {
+        width: 35px;
+        height: 35px;
+      }
+      
+      .choice-btn {
+        font-size: 1em;
+        padding: 15px;
+      }
+      
+      .ending-content {
+        font-size: 1em;
+      }
+      
+      .jesus-image {
+        width: 180px;
+        height: 180px;
+      }
+      
+      .food-display-miracle img {
+        width: 35px;
+        height: 35px;
+      }
+      
+      .basket-moment {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .basket-image {
+        width: 100px;
+        height: 100px;
+      }
+      
+      .music-btn {
+        top: 10px;
+        right: 10px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.3em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    
+    <!-- 背景音樂 -->
+    <audio id="bgMusic" loop>
+      <source src="https://www.dropbox.com/scl/fi/prq9p50pix95x5k6632tw/piano-country-music-61994.mp3?rlkey=qnhphgaop8bv6pnmw23cfvqvp&st=hnrhbmyw&dl=1" type="audio/mpeg">
+    </audio>
+    
+    <!-- 音樂控制按鈕 -->
+    <button id="musicToggle" class="music-btn" onclick="toggleMusic()">
+      🔊
+    </button>
+    
+    <!-- 開始畫面 -->
+    <div id="startScreen" class="screen">
+      <h1>五餅二魚</h1>
+      <h2>你的選擇</h2>
+      <div class="story-intro">
+        <p>你是一個小男孩,</p>
+        <p>帶著午餐來到曠野聽耶穌講道。</p>
+        <img src="https://i.ibb.co/szdSVr3/image.png" alt="小男孩" class="boy-image">
+        <p>你的午餐是:</p>
+        <div class="food-display">
+          <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+          <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+          <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+          <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+          <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+          <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+          <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+        </div>
+        <p>但是...你的肚子好餓...</p>
+      </div>
+      <button class="start-btn" onclick="startGame()">開始故事</button>
+    </div>
+
+    <!-- 選擇點1:留下或離開 -->
+    <div id="choice1Screen" class="screen" style="display: none;">
+      <div class="scene-header">
+        <span class="scene-number">場景 1</span>
+      </div>
+      
+      <div class="story-text">
+        <p>天快黑了...</p>
+        <p>你聽到門徒們在討論:</p>
+        <p class="dialogue">「5000人都沒有食物...」</p>
+        <p class="dialogue">「這裡是曠野,附近沒有商店...」</p>
+        <p class="dialogue">「怎麼辦?」</p>
+        <br>
+        <p>你低頭看著自己的午餐...</p>
+        <p>你的肚子咕嚕咕嚕叫 😰</p>
+        <p>你很餓...如果留下來會更餓...</p>
+      </div>
+
+      <div class="question">你會怎麼做?</div>
+
+      <div class="choices">
+        <button class="choice-btn" onclick="makeChoice1('leave')">
+          🚶‍♂️ 我先回家吃飯吧...
+          <span class="btn-hint">照顧自己的需要</span>
+        </button>
+        
+        <button class="choice-btn" onclick="makeChoice1('stay')">
+          💪 雖然餓,但我想留下來...
+          <span class="btn-hint">陪伴眾人</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 選擇點2:不吃或捐出 -->
+    <div id="choice2Screen" class="screen" style="display: none;">
+      <div class="scene-header">
+        <span class="scene-number">場景 2</span>
+      </div>
+      
+      <div class="story-text">
+        <p>你決定留下來了。</p>
+        <br>
+        <p>門徒們開始到處找食物:</p>
+        <p class="dialogue">「有沒有人帶食物?」</p>
+        <p class="dialogue">「哪怕一點點也好...」</p>
+        <br>
+        <p>你低頭看著自己的午餐...</p>
+        <div class="food-display-small">
+          <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+          <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+          <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+          <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+          <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+          <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+          <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+        </div>
+        <p>這是你僅有的食物...</p>
+        <p>你的肚子還在咕嚕咕嚕叫...</p>
+      </div>
+
+      <div class="question">你會怎麼做?</div>
+
+      <div class="choices">
+        <button class="choice-btn" onclick="makeChoice2('keep')">
+          🤐 我沒辦法給...這是我僅有的...
+          <span class="btn-hint">一起承擔飢餓</span>
+        </button>
+        
+        <button class="choice-btn" onclick="makeChoice2('give')">
+          ❤️ 我可以把我的午餐給大家...
+          <span class="btn-hint">分享你的所有</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 結局A:照顧自己 -->
+    <div id="endingA" class="screen ending" style="display: none;">
+      <div class="ending-header">結局:照顧自己的需要</div>
+      
+      <div class="ending-content">
+        <p>你決定離開,回家吃飯。</p>
+        <p>你的肚子很餓,你知道自己需要這頓飯。</p>
+        <br>
+        <p>你一路走,一路吃著午餐...</p>
+        <br>
+        <div class="food-display-small">
+          <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+          🍽️
+        </div>
+        <br>
+        <p class="highlight">你吃飽了。</p>
+        
+        <img src="https://i.ibb.co/xttMP8Gj/image.png" alt="耶穌" class="jesus-image">
+        
+        <div class="bible-section">
+          <div class="bible-title">💭 聖經的智慧</div>
+          <p class="bible-quote">
+            「他就說:你們來,同我暗暗地到曠野地方去歇一歇。」<br>
+            ——馬可福音 6:31
+          </p>
+          <p>耶穌認可人有身體的需要。</p>
+          <p>照顧自己的基本需求,不是自私,<br>而是智慧和負責任。</p>
+        </div>
+
+        <div class="reflection-section">
+          <div class="reflection-title">🤔 想一想</div>
+          <p>• 什麼時候「照顧自己」是對的?</p>
+          <p>• 什麼時候「留下服事」是對的?</p>
+          <p>• 認識自己的限制,也是一種成熟嗎?</p>
+        </div>
+
+        <div class="ending-message">
+          <p>小男孩離開了,</p>
+          <p>但也許明天,</p>
+          <p>他會用其他方式服事人...</p>
+        </div>
+      </div>
+
+      <button class="restart-btn" onclick="restartGame()">🔄 重新開始</button>
+      <a href="index.html" class="home-btn">🏠 返回首頁</a>
+    </div>
+
+    <!-- 結局B:同理心 -->
+    <div id="endingB" class="screen ending" style="display: none;">
+      <div class="ending-header">結局:同理心的力量</div>
+      
+      <div class="ending-content">
+        <p>你決定留下來,</p>
+        <p>但你無法捐出午餐——那是你僅有的食物...</p>
+        <br>
+        <p>你把午餐收好,沒有吃。</p>
+        <br>
+        <p>天色漸漸暗了...</p>
+        <p class="highlight">5000人都餓著肚子,包括你。</p>
+        <p>沒有神蹟發生。</p>
+        <br>
+        <div class="story-moment">
+          <p>夜晚,你坐在人群中,</p>
+          <p>肚子咕嚕咕嚕叫...</p>
+          <br>
+          <p>旁邊一個小孩也餓著,他看著你:</p>
+          <p class="dialogue">「你也沒吃嗎?」</p>
+          <br>
+          <p>你點點頭。</p>
+          <br>
+          <p>他靠過來,靠著你的肩膀:</p>
+          <p class="dialogue">「至少...我們在一起...」</p>
+        </div>
+
+        <img src="https://i.ibb.co/xttMP8Gj/image.png" alt="耶穌" class="jesus-image">
+
+        <div class="bible-section">
+          <div class="bible-title">💭 聖經的智慧</div>
+          <p class="bible-quote">
+            「與喜樂的人要同樂;與哀哭的人要同哭。」<br>
+            ——羅馬書 12:15
+          </p>
+          <p>你沒有解決問題,</p>
+          <p>你也沒有創造神蹟,</p>
+          <p>但你選擇「一起承擔」。</p>
+          <br>
+          <p class="highlight">有時候,陪伴本身就是力量。</p>
+        </div>
+
+        <div class="reflection-section">
+          <div class="reflection-title">🤔 想一想</div>
+          <p>• 當你無力改變什麼時,「陪伴」有意義嗎?</p>
+          <p>• 「同理心」和「解決問題」哪個更重要?</p>
+          <p>• 上帝會怎麼看你的選擇?</p>
+        </div>
+
+        <div class="ending-message">
+          <p>那一晚,沒有人吃飽,</p>
+          <p>但有一個小男孩學會了:</p>
+          <br>
+          <p class="highlight">即使無能為力,<br>選擇留下、選擇陪伴,<br>也是一種愛。</p>
+        </div>
+      </div>
+
+      <button class="restart-btn" onclick="restartGame()">🔄 重新開始</button>
+      <a href="index.html" class="home-btn">🏠 返回首頁</a>
+    </div>
+
+    <!-- 結局C:分享神蹟 -->
+    <div id="endingC" class="screen ending" style="display: none;">
+      <div class="ending-header">結局:分享的神蹟</div>
+      
+      <div class="ending-content">
+        <p>你決定把午餐捐出來。</p>
+        <br>
+        <p>雖然你也很餓,但你想:</p>
+        <p class="dialogue">「也許...能幫上一點忙...」</p>
+        <br>
+        <div class="story-moment">
+          <p>你走向門徒:</p>
+          <p>「叔叔...我這裡有5個餅和2條魚...」</p>
+          <br>
+          <p>門徒安德烈帶你去見耶穌。</p>
+          <br>
+          <p>耶穌看著你,眼神很溫柔。</p>
+          <p>他接過你的午餐:</p>
+          <p class="dialogue">「謝謝你,孩子。」</p>
+          <br>
+          <p>他舉起你的5個餅、2條魚,</p>
+          <p>望天祝謝...</p>
+        </div>
+
+        <div class="miracle-section">
+          <p class="miracle-text">✨ 奇妙的事發生了... ✨</p>
+          <br>
+          <p>餅,越擘越多...</p>
+          <p>魚,怎麼分都還有...</p>
+          <br>
+          <div class="food-display-miracle">
+            <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+            <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+            <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+            <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+            <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+            <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+            <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+            <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+            <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+            <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+            <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+            <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+            <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+            <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+            <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+            <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+            <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+            <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+          </div>
+          <br>
+          <p class="highlight">5000人,都吃了!而且都吃飽了!</p>
+        </div>
+
+        <div class="basket-moment">
+          <img src="https://i.ibb.co/jPkhr4wd/image.png" alt="野餐籃" class="basket-image">
+          <div class="basket-text">
+            <p>門徒收拾零碎,裝滿了12個籃子!</p>
+            <br>
+            <p>其中一個門徒拿了一籃子給你:</p>
+            <p class="dialogue">「孩子,這是給你的。」</p>
+            <br>
+            <p>你看著滿滿的食物,</p>
+            <p>想起自己原本只有5個餅、2條魚...</p>
+            <br>
+            <p class="dialogue">「這...怎麼可能...」</p>
+          </div>
+        </div>
+
+        <img src="https://i.ibb.co/xttMP8Gj/image.png" alt="耶穌" class="jesus-image">
+
+        <div class="bible-section">
+          <div class="bible-title">💭 聖經的智慧</div>
+          <p class="bible-quote">
+            「少種的少收,多種的多收。」<br>
+            ——哥林多後書 9:6
+          </p>
+          <p>你願意給出「你的全部」(雖然很少),</p>
+          <p>上帝就使用它,成就超過你想像的事。</p>
+          <br>
+          <p>不是因為你的奉獻「夠多」,</p>
+          <p class="highlight">而是因為你「願意」。</p>
+        </div>
+
+        <div class="reflection-section">
+          <div class="reflection-title">🤔 想一想</div>
+          <p>• 上帝在意的是「奉獻多少」還是「願意的心」?</p>
+          <p>• 如果你是這個小男孩,這天對你一生有什麼影響?</p>
+          <p>• 在你的生活中,有什麼「小小的奉獻」可以給出去?</p>
+        </div>
+
+        <div class="ending-message">
+          <p>那一天,</p>
+          <p>一個小男孩的午餐,</p>
+          <p>餵飽了5000人。</p>
+          <br>
+          <p class="highlight">他學會了:<br>在上帝手中,<br>沒有「太少」這回事。</p>
+        </div>
+      </div>
+
+      <button class="restart-btn" onclick="restartGame()">🔄 重新開始</button>
+      <a href="index.html" class="home-btn">🏠 返回首頁</a>
+    </div>
+
+  </div>
+
+  <script>
+    // ========================================
+    // 遊戲邏輯：五餅二魚
+    // ========================================
+
+    // 音樂控制變數
+    let musicPlaying = false;
+    const bgMusic = document.getElementById('bgMusic');
+    const musicToggle = document.getElementById('musicToggle');
+
+    // 顯示指定的畫面，隱藏其他畫面
+    function showScreen(screenId) {
+      // 隱藏所有畫面
+      const allScreens = document.querySelectorAll('.screen');
+      allScreens.forEach(screen => {
+        screen.style.display = 'none';
+      });
+      
+      // 顯示指定畫面
+      const targetScreen = document.getElementById(screenId);
+      if (targetScreen) {
+        targetScreen.style.display = 'block';
+      }
+      
+      // 滾動到頂部
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 開始遊戲
+    function startGame() {
+      console.log('開始遊戲');
+      
+      // 嘗試播放音樂
+      playMusic();
+      
+      showScreen('choice1Screen');
+    }
+
+    // 播放音樂
+    function playMusic() {
+      if (!musicPlaying) {
+        bgMusic.play().then(() => {
+          musicPlaying = true;
+          musicToggle.textContent = '🔊';
+          musicToggle.classList.remove('muted');
+          console.log('音樂開始播放');
+        }).catch(error => {
+          console.log('自動播放被阻止，需要用戶互動:', error);
+        });
+      }
+    }
+
+    // 切換音樂開關
+    function toggleMusic() {
+      if (musicPlaying) {
+        bgMusic.pause();
+        musicPlaying = false;
+        musicToggle.textContent = '🔇';
+        musicToggle.classList.add('muted');
+      } else {
+        bgMusic.play().then(() => {
+          musicPlaying = true;
+          musicToggle.textContent = '🔊';
+          musicToggle.classList.remove('muted');
+        }).catch(error => {
+          console.log('播放失敗:', error);
+        });
+      }
+    }
+
+    // 選擇點1：留下或離開
+    function makeChoice1(choice) {
+      console.log('選擇1:', choice);
+      if (choice === 'leave') {
+        // 選擇離開 → 直接到結局A
+        showScreen('endingA');
+      } else if (choice === 'stay') {
+        // 選擇留下 → 進入選擇點2
+        showScreen('choice2Screen');
+      }
+    }
+
+    // 選擇點2：不吃或捐出
+    function makeChoice2(choice) {
+      console.log('選擇2:', choice);
+      if (choice === 'keep') {
+        // 選擇不吃 → 結局B（同理心）
+        showScreen('endingB');
+      } else if (choice === 'give') {
+        // 選擇捐出 → 結局C（分享神蹟）
+        showScreen('endingC');
+      }
+    }
+
+    // 重新開始遊戲
+    function restartGame() {
+      console.log('重新開始');
+      showScreen('startScreen');
+    }
+
+    // 頁面載入時設定音量
+    window.addEventListener('DOMContentLoaded', () => {
+      bgMusic.volume = 0.5; // 設定音量為50%
+    });
+  </script>
+</body>
+</html>
