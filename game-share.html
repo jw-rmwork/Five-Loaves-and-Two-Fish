@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分餅挑戰 - 五餅二魚</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "微軟正黑體", "Microsoft JhengHei", Arial, sans-serif;
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .game-container {
+      background: white;
+      border-radius: 20px;
+      padding: 12px;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+      max-width: 650px;
+      width: 100%;
+      position: relative;
+      margin: 10px auto;
+    }
+
+    /* 標題區 */
+    .header {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .title {
+      font-size: 1.4em;
+      color: #e67e22;
+      margin-bottom: 3px;
+    }
+
+    /* 遊戲資訊列 */
+    .game-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8f9fa;
+      padding: 8px 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9em;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .info-label {
+      color: #7f8c8d;
+      font-size: 0.8em;
+    }
+
+    .info-value {
+      color: #e67e22;
+      font-size: 1em;
+    }
+
+    .timer {
+      color: #e74c3c;
+    }
+
+    /* 遊戲區域 */
+    .game-area {
+      background: linear-gradient(to bottom, #e3f2fd 0%, #fff 100%);
+      border-radius: 12px;
+      padding: 10px;
+      min-height: 180px;
+      position: relative;
+      margin-bottom: 10px;
+      border: 2px solid #e0e0e0;
+    }
+
+    /* 顧客區域 */
+    .customers-area {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-height: 160px;
+      padding: 8px;
+    }
+
+    .customer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: slideDown 0.5s ease;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .customer:hover {
+      transform: scale(1.05);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .customer-order {
+      background: white;
+      border: 2px solid #e67e22;
+      border-radius: 10px;
+      padding: 6px 10px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 1em;
+      box-shadow: 0 2px 10px rgba(230, 126, 34, 0.3);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .customer-order img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+
+    .customer-image {
+      width: 65px;
+      height: 65px;
+      object-fit: contain;
+      filter: drop-shadow(0 3px 10px rgba(0,0,0,0.2));
+    }
+
+    .customer.served {
+      animation: fadeOut 0.5s ease forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.8);
+      }
+    }
+
+    /* 服務員區域 */
+    .server-area {
+      background: linear-gradient(135deg, #fff8e1, #ffecb3);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border: 2px solid #ffa726;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .server {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .server-image {
+      width: 55px;
+      height: 55px;
+      object-fit: contain;
+      filter: drop-shadow(0 3px 10px rgba(0,0,0,0.2));
+    }
+
+    .server-label {
+      font-weight: bold;
+      color: #f57c00;
+      font-size: 0.85em;
+    }
+
+    /* 食物選擇區 */
+    .food-selector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .food-items {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .food-item {
+      background: white;
+      border: 2px solid #3498db;
+      border-radius: 10px;
+      padding: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      min-width: 60px;
+    }
+
+    .food-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+      border-color: #2980b9;
+    }
+
+    .food-item.selected {
+      background: #3498db;
+      border-color: #2980b9;
+      transform: scale(1.1);
+    }
+
+    .food-item img {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+    }
+
+    .food-count {
+      font-size: 0.95em;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .food-item.selected .food-count {
+      color: white;
+    }
+
+    /* 當前訂單顯示 */
+    .current-order {
+      background: white;
+      border: 2px dashed #9b59b6;
+      border-radius: 10px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 38px;
+      font-size: 1em;
+    }
+
+    .current-order.empty {
+      color: #95a5a6;
+      font-style: italic;
+    }
+
+    .current-order img {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    /* 按鈕 */
+    .buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: white;
+      border: 2px solid #3498db;
+      padding: 8px 20px;
+      font-size: 0.9em;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+      color: #2c3e50;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      background: #3498db;
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #e67e22, #d35400);
+      color: white;
+      border-color: #d35400;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #d35400, #c0392b);
+    }
+
+    .btn-clear {
+      border-color: #e74c3c;
+    }
+
+    .btn-clear:hover {
+      background: #e74c3c;
+    }
+
+    /* 遊戲結束畫面 */
+    .game-over {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      z-index: 100;
+      animation: popIn 0.5s ease;
+      max-width: 90%;
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    .game-over h2 {
+      color: #e67e22;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    .final-score {
+      font-size: 2.5em;
+      color: #27ae60;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .game-over-message {
+      font-size: 1.1em;
+      color: #7f8c8d;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    /* 提示訊息 */
+    .hint {
+      text-align: center;
+      color: #7f8c8d;
+      font-size: 0.9em;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .title {
+        font-size: 1.2em;
+      }
+
+      .game-info {
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .customer-image {
+        width: 55px;
+        height: 55px;
+      }
+
+      .server-image {
+        width: 45px;
+        height: 45px;
+      }
+
+      .food-item {
+        min-width: 50px;
+        padding: 6px;
+      }
+
+      .food-item img {
+        width: 25px;
+        height: 25px;
+      }
+
+      .game-over {
+        padding: 25px;
+        width: 95%;
+      }
+
+      .game-over h2 {
+        font-size: 1.5em;
+      }
+
+      .final-score {
+        font-size: 2em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <!-- 標題 -->
+    <div class="header">
+      <h1 class="title">🍽️ 分餅挑戰</h1>
+    </div>
+
+    <!-- 遊戲資訊 -->
+    <div class="game-info">
+      <div class="info-item">
+        <span class="info-label">分數：</span>
+        <span class="info-value" id="score">0</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">已服務：</span>
+        <span class="info-value" id="served">0</span> 人
+      </div>
+      <div class="info-item timer">
+        <span class="info-label">時間：</span>
+        <span class="info-value" id="timer">60</span> 秒
+      </div>
+    </div>
+
+    <!-- 遊戲區域 -->
+    <div class="game-area">
+      <!-- 顧客區域 -->
+      <div class="customers-area" id="customersArea">
+        <p class="hint">按下「開始遊戲」後，顧客就會開始出現！</p>
+      </div>
+    </div>
+
+    <!-- 服務員區域 -->
+    <div class="server-area">
+      <!-- 服務員 -->
+      <div class="server">
+        <img src="https://i.ibb.co/xqxVWzGw/student.png" alt="門徒" class="server-image">
+        <span class="server-label">準備上菜！</span>
+      </div>
+
+      <!-- 食物選擇 -->
+      <div class="food-selector">
+        <div class="current-order empty" id="currentOrder">
+          點選食物組合訂單
+        </div>
+        <div class="food-items">
+          <div class="food-item" onclick="selectFood('bread')" id="breadBtn">
+            <img src="https://i.ibb.co/dJXxJ7QG/image.png" alt="餅">
+            <span class="food-count" id="breadCount">0</span>
+          </div>
+          <div class="food-item" onclick="selectFood('fish')" id="fishBtn">
+            <img src="https://i.ibb.co/Y4PPcjMg/image.png" alt="魚">
+            <span class="food-count" id="fishCount">0</span>
+          </div>
+        </div>
+        <button class="btn btn-clear" onclick="clearOrder()">🗑️ 清空</button>
+      </div>
+    </div>
+
+    <!-- 按鈕區 -->
+    <div class="buttons">
+      <button class="btn btn-primary" id="startBtn" onclick="startGame()">
+        🎯 開始遊戲
+      </button>
+      <button class="btn" onclick="location.href='games.html'">
+        🏠 返回遊戲區
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // ========================================
+    // 遊戲變數
+    // ========================================
+    let gameRunning = false;
+    let score = 0;
+    let servedCount = 0;
+    let timeLeft = 60;
+    let timerInterval = null;
+    let customerSpawnInterval = null;
+    let customers = [];
+    let currentOrder = { bread: 0, fish: 0 };
+    let nextCustomerId = 0;
+
+    // 圖片URL - 已更新
+    const BREAD_IMG = 'https://i.ibb.co/dJXxJ7QG/image.png';
+    const FISH_IMG = 'https://i.ibb.co/Y4PPcjMg/image.png';
+    const CUSTOMER_IMAGES = [
+      'https://i.ibb.co/1fvdJd9Q/woman.png',
+      'https://i.ibb.co/cS2t42Vw/kid.png',
+      'https://i.ibb.co/ZZ6q8Nj/Man.png'
+    ];
+
+    // ========================================
+    // 開始遊戲
+    // ========================================
+    function startGame() {
+      // 重置遊戲狀態
+      gameRunning = true;
+      score = 0;
+      servedCount = 0;
+      timeLeft = 60;
+      customers = [];
+      nextCustomerId = 0;
+      currentOrder = { bread: 0, fish: 0 };
+
+      // 清除之前的計時器
+      if (timerInterval) clearInterval(timerInterval);
+      if (customerSpawnInterval) clearInterval(customerSpawnInterval);
+
+      // 更新顯示
+      updateDisplay();
+      clearOrder();
+
+      // 禁用開始按鈕
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('customersArea').innerHTML = '';
+
+      // 開始倒數計時
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+
+      // 立即生成第一個顧客
+      spawnCustomer();
+
+      // 之後每3秒生成新顧客
+      customerSpawnInterval = setInterval(() => {
+        if (gameRunning && customers.length < 3) {
+          spawnCustomer();
+        }
+      }, 3000);
+    }
+
+    // ========================================
+    // 生成顧客
+    // ========================================
+    function spawnCustomer() {
+      if (!gameRunning) return;
+
+      const customerId = nextCustomerId++;
+      const imageUrl = CUSTOMER_IMAGES[Math.floor(Math.random() * CUSTOMER_IMAGES.length)];
+      
+      // 隨機訂單 (1-3個餅, 1-2條魚)
+      const breadNeeded = Math.floor(Math.random() * 3) + 1;
+      const fishNeeded = Math.floor(Math.random() * 2) + 1;
+
+      const customer = {
+        id: customerId,
+        image: imageUrl,
+        order: { bread: breadNeeded, fish: fishNeeded }
+      };
+
+      customers.push(customer);
+      renderCustomers();
+    }
+
+    // ========================================
+    // 渲染顧客
+    // ========================================
+    function renderCustomers() {
+      const container = document.getElementById('customersArea');
+      container.innerHTML = '';
+
+      if (customers.length === 0) {
+        container.innerHTML = '<p class="hint">等待顧客中...</p>';
+        return;
+      }
+
+      customers.forEach(customer => {
+        const customerDiv = document.createElement('div');
+        customerDiv.className = 'customer';
+        customerDiv.id = `customer-${customer.id}`;
+        customerDiv.onclick = () => serveCustomer(customer.id);
+
+        // 訂單氣泡
+        const orderDiv = document.createElement('div');
+        orderDiv.className = 'customer-order';
+        
+        // 添加餅圖示
+        for (let i = 0; i < customer.order.bread; i++) {
+          const breadImg = document.createElement('img');
+          breadImg.src = BREAD_IMG;
+          breadImg.alt = '餅';
+          orderDiv.appendChild(breadImg);
+        }
+
+        // 添加魚圖示
+        for (let i = 0; i < customer.order.fish; i++) {
+          const fishImg = document.createElement('img');
+          fishImg.src = FISH_IMG;
+          fishImg.alt = '魚';
+          orderDiv.appendChild(fishImg);
+        }
+
+        // 顧客圖片
+        const customerImg = document.createElement('img');
+        customerImg.src = customer.image;
+        customerImg.className = 'customer-image';
+        customerImg.alt = '顧客';
+
+        customerDiv.appendChild(orderDiv);
+        customerDiv.appendChild(customerImg);
+        container.appendChild(customerDiv);
+      });
+    }
+
+    // ========================================
+    // 選擇食物
+    // ========================================
+    function selectFood(type) {
+      if (!gameRunning) {
+        alert('請先開始遊戲！');
+        return;
+      }
+
+      currentOrder[type]++;
+      updateOrderDisplay();
+    }
+
+    // ========================================
+    // 更新訂單顯示
+    // ========================================
+    function updateOrderDisplay() {
+      const orderDiv = document.getElementById('currentOrder');
+      orderDiv.innerHTML = '';
+      orderDiv.classList.remove('empty');
+
+      if (currentOrder.bread === 0 && currentOrder.fish === 0) {
+        orderDiv.classList.add('empty');
+        orderDiv.textContent = '點選食物組合訂單';
+        return;
+      }
+
+      // 顯示餅
+      for (let i = 0; i < currentOrder.bread; i++) {
+        const img = document.createElement('img');
+        img.src = BREAD_IMG;
+        img.alt = '餅';
+        orderDiv.appendChild(img);
+      }
+
+      // 顯示魚
+      for (let i = 0; i < currentOrder.fish; i++) {
+        const img = document.createElement('img');
+        img.src = FISH_IMG;
+        img.alt = '魚';
+        orderDiv.appendChild(img);
+      }
+
+      // 更新計數
+      document.getElementById('breadCount').textContent = currentOrder.bread;
+      document.getElementById('fishCount').textContent = currentOrder.fish;
+    }
+
+    // ========================================
+    // 清空訂單
+    // ========================================
+    function clearOrder() {
+      currentOrder = { bread: 0, fish: 0 };
+      document.getElementById('breadCount').textContent = '0';
+      document.getElementById('fishCount').textContent = '0';
+      updateOrderDisplay();
+    }
+
+    // ========================================
+    // 服務顧客
+    // ========================================
+    function serveCustomer(customerId) {
+      if (!gameRunning) return;
+
+      const customer = customers.find(c => c.id === customerId);
+      if (!customer) return;
+
+      // 檢查訂單是否正確
+      if (currentOrder.bread === customer.order.bread && 
+          currentOrder.fish === customer.order.fish) {
+        
+        // 正確！
+        score += 10;
+        servedCount++;
+
+        // 移除顧客動畫
+        const customerDiv = document.getElementById(`customer-${customerId}`);
+        if (customerDiv) {
+          customerDiv.classList.add('served');
+          setTimeout(() => {
+            customers = customers.filter(c => c.id !== customerId);
+            renderCustomers();
+          }, 500);
+        }
+
+        clearOrder();
+        updateDisplay();
+
+        // 成功提示
+        showFeedback('✓ 正確！+10分', 'success');
+      } else {
+        // 錯誤
+        showFeedback('✗ 訂單不符！', 'error');
+      }
+    }
+
+    // ========================================
+    // 顯示反饋訊息
+    // ========================================
+    function showFeedback(message, type) {
+      const feedback = document.createElement('div');
+      feedback.textContent = message;
+      feedback.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: ${type === 'success' ? '#27ae60' : '#e74c3c'};
+        color: white;
+        padding: 20px 40px;
+        border-radius: 15px;
+        font-size: 1.3em;
+        font-weight: bold;
+        z-index: 1000;
+        animation: popIn 0.3s ease;
+      `;
+      document.body.appendChild(feedback);
+
+      setTimeout(() => {
+        feedback.remove();
+      }, 1000);
+    }
+
+    // ========================================
+    // 更新顯示
+    // ========================================
+    function updateDisplay() {
+      document.getElementById('score').textContent = score;
+      document.getElementById('served').textContent = servedCount;
+    }
+
+    // ========================================
+    // 結束遊戲
+    // ========================================
+    function endGame() {
+      gameRunning = false;
+      
+      // 清除計時器
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      if (customerSpawnInterval) {
+        clearInterval(customerSpawnInterval);
+        customerSpawnInterval = null;
+      }
+
+      // 啟用開始按鈕
+      document.getElementById('startBtn').disabled = false;
+
+      // 評語
+      let message = '';
+      if (servedCount >= 20) {
+        message = '🌟 太棒了！你是上菜高手！';
+      } else if (servedCount >= 15) {
+        message = '👏 很不錯！繼續加油！';
+      } else if (servedCount >= 10) {
+        message = '😊 還不錯！多練習會更好！';
+      } else {
+        message = '💪 別灰心！再試一次吧！';
+      }
+
+      // 顯示結束畫面
+      const gameOverDiv = document.createElement('div');
+      gameOverDiv.className = 'game-over';
+      gameOverDiv.innerHTML = `
+        <h2>遊戲結束</h2>
+        <div class="final-score">${score} 分</div>
+        <div class="game-over-message">
+          <p>成功服務了 <strong>${servedCount}</strong> 位顧客</p>
+          <p>${message}</p>
+          <p style="margin-top: 20px; color: #e67e22; font-style: italic;">
+            「施比受更為有福」<br>—— 使徒行傳 20:35
+          </p>
+        </div>
+        <div class="buttons">
+          <button class="btn btn-primary" onclick="restartGame()">
+            🔄 再玩一次
+          </button>
+          <button class="btn" onclick="location.href='games.html'">
+            🏠 返回遊戲區
+          </button>
+        </div>
+      `;
+
+      document.querySelector('.game-container').appendChild(gameOverDiv);
+    }
+
+    // ========================================
+    // 重新開始遊戲
+    // ========================================
+    function restartGame() {
+      // 移除結束畫面
+      const gameOverDiv = document.querySelector('.game-over');
+      if (gameOverDiv) {
+        gameOverDiv.remove();
+      }
+      
+      // 重新開始
+      startGame();
+    }
+
+    // ========================================
+    // 頁面載入完成
+    // ========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('分餅挑戰載入完成');
+    });
+  </script>
+</body>
+</html>
